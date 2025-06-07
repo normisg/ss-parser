@@ -3,3 +3,5 @@ feedparser
 sqlalchemy
 bs4
 python-dotenv
+fastapi
+uvicorn

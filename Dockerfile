@@ -21,7 +21,7 @@ ENV DATABASE_PATH=sqlite:///data/ss_entries.db
 RUN mkdir -p /data
 
 # Expose port if needed (uncomment if your app serves HTTP)
-# EXPOSE 8000
+EXPOSE 8000
 
 # Set environment variables (optional)
 ENV PYTHONUNBUFFERED=1
