@@ -1,7 +1,20 @@
 import os
 from dotenv import load_dotenv
+from logger import logger
 
-load_dotenv()
+def is_running_in_docker():
+    # Nosaka, vai Python darbojas Docker konteinerī
+    try:
+        if os.path.exists('/.dockerenv'):
+            return True
+        with open('/proc/1/cgroup', 'rt') as f:
+            return 'docker' in f.read() or 'kubepods' in f.read()
+    except Exception:
+        return False
+
+# Tikai ārpus Docker ielādē .env failu
+if not is_running_in_docker():
+    load_dotenv(override=True)
 
 def get_list_from_env(var_name):
     value = os.getenv(var_name, '')
@@ -19,8 +32,30 @@ def get_database_path():
     db_path = os.getenv('DATABASE_PATH', 'sqlite:///data/ss_entries.db')
     return db_path
 
-SS_RSS_URL = os.getenv('SS_RSS_URL', '').strip('"')
+def get_all_rss_urls():
+    urls = []
+    index = 1
+    while True:
+        key = f'SS_RSS_URL_{index}'
+        url = os.getenv(key)
+        if not url:
+            break
+        logger.info(f"[conf] Found RSS feed: {key} = {url}")
+        urls.append(url.strip())
+        index += 1
+    return urls
+
+def get_bool_from_env(var_name, default=False):
+    val = os.getenv(var_name, str(default)).strip().lower()
+    return val in ['1', 'true', 'yes']
+
+SS_RSS_URLS = get_all_rss_urls()
+
 LOCATION = get_list_from_env('LOCATION')
+logger.info(f"[conf] Parsed LOCATION = {LOCATION}")
+STRICT_LOCATION_MATCH = get_bool_from_env('STRICT_LOCATION_MATCH')
+logger.info(f"[conf] Set strict LOCATION match = {STRICT_LOCATION_MATCH}")
+
 BUILDING_TYPE = get_list_from_env('BUILDING_TYPE')
 ROOMS = get_int_from_env('ROOMS')
 FLOOR = get_int_from_env('FLOOR')
@@ -32,3 +67,21 @@ NTFY_USERNAME = os.getenv('NTFY_USERNAME', '')
 NTFY_PASSWORD = os.getenv('NTFY_PASSWORD', '')
 DATABASE_PATH = get_database_path()
 PARSE_INTERVAL_MINUTES = get_int_from_env('PARSE_INTERVAL_MINUTES', 30)
+TELEGRAM_TOKEN = os.getenv('TELEGRAM_TOKEN', '')
+TELEGRAM_CHAT_ID = os.getenv('TELEGRAM_CHAT_ID', '')
+
+def get_label_list(var_name, default=''):
+    val = os.getenv(var_name, default)
+    return [v.strip() for v in val.split(',') if v.strip()]
+
+# Fiksētās vērtības no SS.lv tabulas kolonnām
+LABELS = {
+    'location': ['Pilsēta', 'Pilsēta/pagasts'],
+    'region': ['Rajons', 'Pilsēta, rajons'],
+    'street': ['Iela'],
+    'building_type': ['Mājas tips'],
+    'rooms': ['Istabas'],
+    'floor': ['Stāvs'],
+    'area': ['Platība'],
+    'price': ['Cena'],
+}

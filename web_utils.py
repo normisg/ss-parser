@@ -1,5 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
+from logger import logger
 import random
 
 USER_AGENTS = [
@@ -14,9 +15,13 @@ def fetch_html(url):
     headers = {
         "User-Agent": random.choice(USER_AGENTS)
     }
-    response = requests.get(url, headers=headers)
-    response.raise_for_status()
-    return response.text
+    try:
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()
+        return response.text
+    except Exception as e:
+        logger.info(f"[fetch_html] Error fetching {url}: {e}")  
+        return None
 
 def parse_html(html):
     soup = BeautifulSoup(html, 'html.parser')
