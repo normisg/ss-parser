@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SS.lv Entries</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+    <style>
+        body[data-bs-theme="dark"] {
+            background-color: #181a1b;
+            color: #e0e0e0;
+        }
+        .dataTables_wrapper .dataTables_filter input,
+        .dataTables_wrapper .dataTables_length select {
+            background: #23272b;
+            color: #e0e0e0;
+            border: 1px solid #444;
+        }
+        table.dataTable {
+            background: #23272b;
+            color: #e0e0e0;
+        }
+        table.dataTable thead th {
+            background: #23272b;
+            color: #e0e0e0;
+        }
+        table.dataTable tbody td {
+            background: #23272b;
+            color: #e0e0e0;
+        }
+        .btn-toggle-dark {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body data-bs-theme="dark">
+    <button class="btn btn-secondary btn-toggle-dark">Toggle Dark/Light</button>
+    <div class="container-fluid py-4">
+        <h1 class="mb-4">SS.lv Entries</h1>
+        <table id="entries" class="display table table-striped table-bordered w-100" style="width:100%">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Title</th>
+                    <th>Link</th>
+                    <th>Published</th>
+                    <th>Location</th>
+                    <th>Building Type</th>
+                    <th>Rooms</th>
+                    <th>Floor</th>
+                    <th>Area</th>
+                    <th>Price</th>
+                    <th>€/m²</th>
+                    <th>Street</th>
+                    <th>Match</th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+    <script>
+    $(document).ready(function() {
+        $('#entries').DataTable({
+            ajax: {
+                url: '/entries',
+                dataSrc: ''
+            },
+            columns: [
+                { data: 'id' },
+                { data: 'title' },
+                { data: 'link', render: function(data) { return `<a href='${data}' target='_blank'>link</a>`; } },
+                { data: 'published' },
+                { data: 'location' },
+                { data: 'building_type' },
+                { data: 'rooms' },
+                { data: 'floor' },
+                { data: 'area' },
+                { data: 'price' },
+                { data: 'price_m2' },
+                { data: 'street' },
+                { data: 'is_match', render: function(data) { return data ? '✔️' : ''; } }
+            ]
+        });
+        // Dark/Light mode toggle
+        $('.btn-toggle-dark').on('click', function() {
+            const body = document.body;
+            if (body.getAttribute('data-bs-theme') === 'dark') {
+                body.setAttribute('data-bs-theme', 'light');
+            } else {
+                body.setAttribute('data-bs-theme', 'dark');
+            }
+        });
+    });
+    </script>
+</body>
+</html>
