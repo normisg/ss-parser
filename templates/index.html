@@ -14,23 +14,42 @@
             background-color: #181a1b;
             color: #e0e0e0;
         }
+        body[data-bs-theme="light"] {
+            background-color: #fff;
+            color: #212529;
+        }
         .dataTables_wrapper .dataTables_filter input,
         .dataTables_wrapper .dataTables_length select {
-            background: #23272b;
-            color: #e0e0e0;
+            background: var(--dt-bg, #23272b);
+            color: var(--dt-color, #e0e0e0);
             border: 1px solid #444;
         }
         table.dataTable {
-            background: #23272b;
-            color: #e0e0e0;
+            background: var(--dt-bg, #23272b);
+            color: var(--dt-color, #e0e0e0);
         }
         table.dataTable thead th {
-            background: #23272b;
-            color: #e0e0e0;
+            background: var(--dt-bg, #23272b);
+            color: var(--dt-color, #e0e0e0);
         }
         table.dataTable tbody td {
-            background: #23272b;
-            color: #e0e0e0;
+            background: var(--dt-bg, #23272b);
+            color: var(--dt-color, #e0e0e0);
+        }
+        body[data-bs-theme="light"] .dataTables_wrapper .dataTables_filter input,
+        body[data-bs-theme="light"] .dataTables_wrapper .dataTables_length select,
+        body[data-bs-theme="light"] table.dataTable,
+        body[data-bs-theme="light"] table.dataTable thead th,
+        body[data-bs-theme="light"] table.dataTable tbody td {
+            --dt-bg: #fff;
+            --dt-color: #212529;
+            background: #fff !important;
+            color: #212529 !important;
+            border-color: #dee2e6 !important;
+        }
+        /* Add margin below the search input */
+        .dataTables_wrapper .dataTables_filter {
+            margin-bottom: 1rem;
         }
         .btn-toggle-dark {
             position: fixed;
@@ -71,6 +90,7 @@
                 url: '/entries',
                 dataSrc: ''
             },
+            pageLength: 25,
             columns: [
                 { data: 'id' },
                 { data: 'title' },
