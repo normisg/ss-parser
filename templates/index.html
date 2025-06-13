@@ -61,6 +61,10 @@
 </head>
 <body data-bs-theme="dark">
     <button class="btn btn-secondary btn-toggle-dark">Toggle Dark/Light</button>
+    <div class="form-check form-switch mb-3" style="position: fixed; top: 4.5rem; right: 1rem; z-index: 1000;">
+        <input class="form-check-input" type="checkbox" id="showMatchesOnly">
+        <label class="form-check-label" for="showMatchesOnly">Show only matches</label>
+    </div>
     <div class="container-fluid py-4">
         <h1 class="mb-4">SS.lv Entries</h1>
         <table id="entries" class="display table table-striped table-bordered w-100" style="width:100%">
@@ -85,10 +89,13 @@
     </div>
     <script>
     $(document).ready(function() {
-        $('#entries').DataTable({
+        var table = $('#entries').DataTable({
             ajax: {
                 url: '/entries',
-                dataSrc: ''
+                dataSrc: '',
+                data: function(d) {
+                    d.matches_only = $('#showMatchesOnly').is(':checked') ? '1' : '0';
+                }
             },
             pageLength: 25,
             columns: [
@@ -106,6 +113,9 @@
                 { data: 'street' },
                 { data: 'is_match', render: function(data) { return data ? '✔️' : ''; } }
             ]
+        });
+        $('#showMatchesOnly').on('change', function() {
+            table.ajax.reload();
         });
         // Dark/Light mode toggle
         $('.btn-toggle-dark').on('click', function() {

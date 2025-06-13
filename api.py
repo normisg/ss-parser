@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from db_utils import Session, Entry
 from fastapi.responses import JSONResponse, HTMLResponse
 from fastapi.encoders import jsonable_encoder
@@ -15,9 +15,13 @@ def get_stats():
     return JSONResponse({"total": total, "matches": matches})
 
 @app.get("/entries")
-def get_entries():
+def get_entries(request: Request):
+    matches_only = request.query_params.get("matches_only") == "1"
     session = Session()
-    entries = session.query(Entry).all()
+    query = session.query(Entry)
+    if matches_only:
+        query = query.filter_by(is_match=True)
+    entries = query.all()
     session.close()
     # Convert SQLAlchemy objects to dicts
     data = [
