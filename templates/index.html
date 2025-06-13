@@ -91,9 +91,11 @@
     <script>
     $(document).ready(function() {
         var table = $('#entries').DataTable({
+            serverSide: true,
+            processing: true,
             ajax: {
                 url: '/entries',
-                dataSrc: '',
+                dataSrc: 'data',
                 data: function(d) {
                     d.matches_only = $('#showMatchesOnly').is(':checked') ? '1' : '0';
                 }
@@ -105,11 +107,7 @@
                 { data: 'link', render: function(data) { return `<a href='${data}' target='_blank'>link</a>`; } },
                 { data: 'published', render: function(data) {
                     if (!data) return '';
-                    // Try to extract YYYY-MM-DD from the string
-                    var match = data.match(/(\d{4}-\d{2}-\d{2})/);
-                    if (match) return match[1];
-                    // Try to parse as Date
-                    var d = new Date(data);
+                    var d = new Date(data * 1000); // unix timestamp to JS date
                     if (!isNaN(d)) {
                         return d.toISOString().slice(0,10);
                     }

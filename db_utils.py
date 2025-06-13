@@ -2,6 +2,7 @@ from sqlalchemy import create_engine, Column, Integer, String, Boolean, Float
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from config import DATABASE_PATH
+import dateutil.parser
 
 Base = declarative_base()
 
@@ -10,7 +11,7 @@ class Entry(Base):
     id = Column(Integer, primary_key=True)
     title = Column(String)
     link = Column(String)
-    published = Column(String)
+    published = Column(Integer)  # Store as Unix timestamp (seconds since epoch)
     is_processed = Column(Boolean, default=False)
     is_match = Column(Boolean, default=None)
     location = Column(String, default=None)
@@ -31,10 +32,18 @@ def save_entries_to_db(entries):
     for entry in entries:
         exists = session.query(Entry).filter_by(link=entry.get('link')).first()
         if not exists:
+            published_val = entry.get('published')
+            published_ts = None
+            if published_val:
+                try:
+                    dt = dateutil.parser.parse(published_val)
+                    published_ts = int(dt.timestamp())
+                except Exception:
+                    published_ts = None
             db_entry = Entry(
                 title=entry.get('title'),
                 link=entry.get('link'),
-                published=entry.get('published'),
+                published=published_ts,
                 is_processed=False,
                 location=entry.get('location'),
                 building_type=entry.get('building_type'),
