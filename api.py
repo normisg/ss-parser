@@ -52,7 +52,7 @@ def get_entries(request: Request):
                 col = col.desc()
             query = query.order_by(col)
     else:
-        query = query.order_by(Entry.published.desc())
+        query = query.order_by(Entry.id.desc())
     total_count = session.query(Entry).count() if not matches_only else session.query(Entry).filter_by(is_match=True).count()
     filtered_count = query.count()
     entries = query.offset(start).limit(length).all()
